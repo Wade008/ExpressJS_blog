@@ -32,6 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const mongoose = require('mongoose');
+
 let databaseURL;
 switch (process.env.NODE_ENV.toLowerCase()) {
     case "test":
@@ -47,6 +48,7 @@ switch (process.env.NODE_ENV.toLowerCase()) {
         console.error("Incorrect JS environment specified, database will not be connected.");
         break;
 }
+
 const { databaseConnector } = require('./database');
 databaseConnector(databaseURL).then(() => {
     console.log("Database connected successfully!");
@@ -72,6 +74,31 @@ app.get("/databaseHealth", (request, response) => {
         dbModels: databaseModels,
         dbHost: databaseHost
     })
+});
+
+
+app.get("/databaseDump", async (request, response) => {
+    // Set up an object to store our data.
+    const dumpContainer = {};
+
+    // Get the names of all collections in the DB.
+    var collections = await mongoose.connection.db.listCollections().toArray();
+    collections = collections.map((collection) => collection.name);
+
+    // For each collection, get all their data and add it to the dumpContainer.
+    for (const collectionName of collections) {
+        let collectionData = await mongoose.connection.db.collection(collectionName).find({}).toArray();
+        dumpContainer[collectionName] = collectionData;
+    }
+
+    // Confirm in the terminal that the server is returning the right data.
+    // With pretty formatting too, via JSON.stringify(value, null, spacing for indentation).
+    console.log("Dumping all of this data to the client: \n" + JSON.stringify(dumpContainer, null, 4));
+
+    // Return the big data object.
+    response.json({
+        data: dumpContainer
+    });
 });
 
 
