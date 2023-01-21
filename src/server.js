@@ -31,7 +31,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const rolesController = require("./controllers/RoleRoutes")
+
+app.use("/roles", rolesController)
+
 const mongoose = require('mongoose');
+
+
+
+
 
 let databaseURL;
 switch (process.env.NODE_ENV.toLowerCase()) {
