@@ -32,14 +32,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const rolesController = require("./controllers/RoleRoutes")
+const usersController = require("./controllers/UserRoutes");
+const postsController = require("./controllers/PostRoutes");
 
-app.use("/roles", rolesController)
+app.use("/roles", rolesController);
+app.use("/users", usersController);
+app.use("/posts", postsController);
+
 
 const mongoose = require('mongoose');
-
-
-
-
 
 let databaseURL;
 switch (process.env.NODE_ENV.toLowerCase()) {
